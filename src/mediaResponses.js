@@ -1,6 +1,18 @@
 const fs = require('fs');
 const path = require('path');
 
+const createStream = (file,response,start,end) =>{
+    const stream = fs.createReadStream(file, { start, end });
+    stream.on('open', () => {
+      stream.pipe(response);
+    });
+
+    stream.on('error', (streamErr) => {
+      response.end(streamErr);
+    });
+    return stream
+}
+
 const loadFile = (request,response,pathway,fileType) =>{
     const file = path.resolve(__dirname, pathway);
 
@@ -40,18 +52,6 @@ const loadFile = (request,response,pathway,fileType) =>{
 
     return createStream(file,response,start,end);
   });
-}
-
-const createStream = (file,response,start,end) =>{
-    const stream = fs.createReadStream(file, { start, end });
-    stream.on('open', () => {
-      stream.pipe(response);
-    });
-
-    stream.on('error', (streamErr) => {
-      response.end(streamErr);
-    });
-    return stream
 }
 
 const getParty = (request, response) => {
